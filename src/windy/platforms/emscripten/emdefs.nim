@@ -76,6 +76,11 @@ EM_JS(void, setup_resize_observer, (void* userData), {
     }
   }
 });
+
+EM_JS(void, set_canvas_cursor, (const char* cursor), {
+  // Set the CSS cursor property on the canvas element
+  Module.canvas.style.cursor = UTF8ToString(cursor);
+});
 """.}
 
 proc canvas_get_width*(): cint {.importc.}
@@ -83,6 +88,7 @@ proc canvas_get_height*(): cint {.importc.}
 proc set_canvas_size*(width, height: cint) {.importc.}
 proc make_canvas_focusable*() {.importc.}
 proc setup_resize_observer*(userData: pointer) {.importc.}
+proc set_canvas_cursor*(cursor: cstring) {.importc.}
 
 type
   EMSCRIPTEN_RESULT* = cint

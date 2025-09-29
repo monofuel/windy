@@ -128,6 +128,11 @@ proc close*(window: Window) =
 proc closeRequested*(window: Window): bool =
   window.isCloseRequested
 
+proc `closeRequested=`*(window: Window, value: bool) =
+  window.isCloseRequested = value
+  if value and window.onCloseRequest != nil:
+    window.onCloseRequest()
+
 proc pollEvents*() =
   # Emscripten doesn't need to poll events, only callbacks.
   discard
@@ -253,7 +258,26 @@ proc cursor*(window: Window): Cursor =
 
 proc `cursor=`*(window: Window, cursor: Cursor) =
   window.state.cursor = cursor
-  # TODO: Apply CSS cursor style based on cursor type
+  
+  # Map CursorKind to CSS cursor values.
+  let cssValue: cstring = case cursor.kind:
+    of ArrowCursor: "default"
+    of PointerCursor: "pointer"
+    of IBeamCursor: "text"
+    of CrosshairCursor: "crosshair"
+    of ClosedHandCursor: "grabbing"
+    of OpenHandCursor: "grab"
+    of ResizeLeftCursor: "w-resize"
+    of ResizeRightCursor: "e-resize"
+    of ResizeLeftRightCursor: "ew-resize"
+    of ResizeUpCursor: "n-resize"
+    of ResizeDownCursor: "s-resize"
+    of ResizeUpDownCursor: "ns-resize"
+    of OperationNotAllowedCursor: "not-allowed"
+    of WaitCursor: "wait"
+    of CustomCursor: "default"  # Custom cursors not yet supported.
+  
+  set_canvas_cursor(cssValue)
 
 # Style functions
 proc style*(window: Window): WindowStyle =
