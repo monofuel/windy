@@ -2,7 +2,7 @@ import
   std/[os, sequtils, sets, strformat, strutils, times, unicode, uri, pathnorm],
   ../../[common, internal],
   vmath, pixie,
-  x11/[glx, keysym, x, xevent, xlib, xcursor]
+  x11/[glx, keysym, x, xevent, xlib, xcursor, xrandr]
 
 import ../../http
 export http
@@ -1326,6 +1326,38 @@ proc `icon=`*(window: Window, icon: Image) =
 proc url*(window: Window): string =
   ## Url cannot be gotten on linux.
   warn "Url cannot be gotten on linux"
+
+proc getScreens*(): seq[common.Screen] =
+  init()
+  let res = XRRGetScreenResourcesCurrent(display, display.defaultRootWindow)
+  if res == nil:
+    return @[]
+  defer: XRRFreeScreenResources(res)
+
+  var primaryCrtc: RRCrtc
+  for i in 0 ..< res.noutput:
+    let output = XRRGetOutputInfo(display, res, res.outputs[i])
+    if output == nil:
+      continue
+    defer: XRRFreeOutputInfo(output)
+    if output.connection == RR_Connected and output.crtc != 0:
+      primaryCrtc = output.crtc
+      break
+
+  for i in 0 ..< res.ncrtc:
+    let crtc = XRRGetCrtcInfo(display, res, res.crtcs[i])
+    if crtc == nil:
+      continue
+    defer: XRRFreeCrtcInfo(crtc)
+    if crtc.width == 0 or crtc.height == 0:
+      continue
+    result.add common.Screen(
+      left: crtc.x.int,
+      right: crtc.x.int + crtc.width.int,
+      top: crtc.y.int,
+      bottom: crtc.y.int + crtc.height.int,
+      primary: res.crtcs[i] == primaryCrtc
+    )
 
 proc getConfigHome*(appName: string): string =
   ## Returns the platform-appropriate user config directory for the given app name.
