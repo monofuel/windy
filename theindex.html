@@ -16,13 +16,16 @@
 <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH4QQQEwksSS9ZWwAAAk1JREFUWMPtll2ITVEUx39nn/O7Y5qR8f05wtCUUr6ZIS++8pEnkZInPImneaCQ5METNdOkeFBKUhMPRIkHKfEuUZSUlGlKPN2TrgfncpvmnntnmlEyq1Z7t89/rf9a6+y99oZxGZf/XeIq61EdtgKXgdXA0xrYAvBjOIF1AI9zvjcC74BSpndrJPkBWDScTF8Aa4E3wDlgHbASaANmVqlcCnwHvgDvgVfAJ+AikAAvgfVZwLnSVZHZaOuKoQi3ZOMi4NkYkpe1p4J7A8BpYAD49hfIy/oqG0+hLomiKP2L5L+1ubn5115S+3OAn4EnwBlgMzCjyt6ZAnQCJ4A7wOs88iRJHvw50HoujuPBoCKwHWiosy8MdfZnAdcHk8dxXFJ3VQbQlCTJvRBCGdRbD4M6uc5glpY3eAihpN5S5w12diSEcCCEcKUO4ljdr15T76ur1FDDLIQQ3qv71EdDOe3Kxj3leRXyk+pxdWnFWod6Wt2bY3de3aSuUHcPBVimHs7mK9WrmeOF6lR1o9qnzskh2ar2qm1qizpfXaPeVGdlmGN5pb09qMxz1Xb1kLqgzn1RyH7JUXW52lr5e/Kqi9qpto7V1atuUzfnARrV7jEib1T76gG2qxdGmXyiekkt1GswPTtek0aBfJp6YySGBfWg2tPQ0FAYgf1stUfdmdcjarbYJEniKIq6gY/Aw+zWHAC+p2labGpqiorFYgGYCEzN7oQdQClN07O1/EfDyGgC0ALMBdYAi4FyK+4H3gLPsxfR1zRNi+NP7nH5J+QntnXe5B5mpfQAAAAASUVORK5CYII=">
 
 <!-- CSS -->
-<link rel="stylesheet" type="text/css" href="nimdoc.out.css?v=2.2.6">
+<link rel="stylesheet" type="text/css" href="nimdoc.out.css?v=2.2.12">
 
 <!-- JS -->
-<script type="text/javascript" src="dochack.js?v=2.2.6"></script>
+<script type="text/javascript" src="dochack.js?v=2.2.12"></script>
 </head>
 <body>
   <div class="document" id="documentId">
+    <input type="checkbox" id="nav-toggle" hidden>
+    <label for="nav-toggle" id="nav-burger">&#9776;</label>
+    <label for="nav-toggle" id="nav-overlay"></label>
     <div class="container">
       <h1 class="title">Index</h1>
       Modules: <a href="windy.html">windy</a>, <a href="windy/common.html">windy/common</a>, <a href="windy/http.html">windy/http</a>, <a href="windy/internal.html">windy/internal</a>, <a href="windy/platforms/linux/platform.html">windy/platforms/linux/platform</a>, <a href="windy/platforms/linux/x11/glx.html">windy/platforms/linux/x11/glx</a>, <a href="windy/platforms/linux/x11/keysym.html">windy/platforms/linux/x11/keysym</a>, <a href="windy/platforms/linux/x11/x.html">windy/platforms/linux/x11/x</a>, <a href="windy/platforms/linux/x11/xcursor.html">windy/platforms/linux/x11/xcursor</a>, <a href="windy/platforms/linux/x11/xevent.html">windy/platforms/linux/x11/xevent</a>, <a href="windy/platforms/linux/x11/xlib.html">windy/platforms/linux/x11/xlib</a>.<br/><p /><h2>API symbols</h2>
@@ -342,6 +345,10 @@
 <li><a class="reference external"
           data-doc-search-tag="x: const CapRound" href="windy/platforms/linux/x11/x.html#CapRound">x: const CapRound</a></li>
           </ul></dd>
+<dt><a name="captureMouse" href="#captureMouse"><span>captureMouse:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="platform: proc captureMouse(window: Window)" href="windy/platforms/linux/platform.html#captureMouse%2CWindow">platform: proc captureMouse(window: Window)</a></li>
+          </ul></dd>
 <dt><a name="CenterGravity" href="#CenterGravity"><span>CenterGravity:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="x: const CenterGravity" href="windy/platforms/linux/x11/x.html#CenterGravity">x: const CenterGravity</a></li>
@@ -349,6 +356,10 @@
 <dt><a name="centerWindow" href="#centerWindow"><span>centerWindow:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="platform: proc centerWindow(window: Window)" href="windy/platforms/linux/platform.html#centerWindow%2CWindow">platform: proc centerWindow(window: Window)</a></li>
+          </ul></dd>
+<dt><a name="clearButtonsTemplate" href="#clearButtonsTemplate"><span>clearButtonsTemplate:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="internal: template clearButtonsTemplate()" href="windy/internal.html#clearButtonsTemplate.t">internal: template clearButtonsTemplate()</a></li>
           </ul></dd>
 <dt><a name="ClipboardContentKind" href="#ClipboardContentKind"><span>ClipboardContentKind:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
@@ -403,6 +414,22 @@
 <dt><a name="Complex" href="#Complex"><span>Complex:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="x: const Complex" href="windy/platforms/linux/x11/x.html#Complex">x: const Complex</a></li>
+          </ul></dd>
+<dt><a name="ConfirmCancel" href="#ConfirmCancel"><span>ConfirmCancel:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="common: ConfirmKind.ConfirmCancel" href="windy/common.html#ConfirmCancel">common: ConfirmKind.ConfirmCancel</a></li>
+          </ul></dd>
+<dt><a name="ConfirmKind" href="#ConfirmKind"><span>ConfirmKind:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="common: enum ConfirmKind" href="windy/common.html#ConfirmKind">common: enum ConfirmKind</a></li>
+          </ul></dd>
+<dt><a name="ConfirmNo" href="#ConfirmNo"><span>ConfirmNo:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="common: ConfirmKind.ConfirmNo" href="windy/common.html#ConfirmNo">common: ConfirmKind.ConfirmNo</a></li>
+          </ul></dd>
+<dt><a name="ConfirmYes" href="#ConfirmYes"><span>ConfirmYes:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="common: ConfirmKind.ConfirmYes" href="windy/common.html#ConfirmYes">common: ConfirmKind.ConfirmYes</a></li>
           </ul></dd>
 <dt><a name="contentScale" href="#contentScale"><span>contentScale:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
@@ -700,6 +727,10 @@
 <li><a class="reference external"
           data-doc-search-tag="x: const FamilyServerInterpreted" href="windy/platforms/linux/x11/x.html#FamilyServerInterpreted">x: const FamilyServerInterpreted</a></li>
           </ul></dd>
+<dt><a name="FileDialogFilter" href="#FileDialogFilter"><span>FileDialogFilter:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="common: object FileDialogFilter" href="windy/common.html#FileDialogFilter">common: object FileDialogFilter</a></li>
+          </ul></dd>
 <dt><a name="FileDropCallback" href="#FileDropCallback"><span>FileDropCallback:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="common: type FileDropCallback" href="windy/common.html#FileDropCallback">common: type FileDropCallback</a></li>
@@ -872,9 +903,25 @@
 <li><a class="reference external"
           data-doc-search-tag="x: const GCTileStipYOrigin" href="windy/platforms/linux/x11/x.html#GCTileStipYOrigin">x: const GCTileStipYOrigin</a></li>
           </ul></dd>
+<dt><a name="getClipboardContentKinds" href="#getClipboardContentKinds"><span>getClipboardContentKinds:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="platform: proc getClipboardContentKinds(): set[ClipboardContentKind]" href="windy/platforms/linux/platform.html#getClipboardContentKinds">platform: proc getClipboardContentKinds(): set[ClipboardContentKind]</a></li>
+          </ul></dd>
+<dt><a name="getClipboardImage" href="#getClipboardImage"><span>getClipboardImage:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="platform: proc getClipboardImage(): Image" href="windy/platforms/linux/platform.html#getClipboardImage">platform: proc getClipboardImage(): Image</a></li>
+          </ul></dd>
 <dt><a name="getClipboardString" href="#getClipboardString"><span>getClipboardString:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="platform: proc getClipboardString(): string" href="windy/platforms/linux/platform.html#getClipboardString">platform: proc getClipboardString(): string</a></li>
+          </ul></dd>
+<dt><a name="getConfig" href="#getConfig"><span>getConfig:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="platform: proc getConfig(appName: string; fileName: string): string" href="windy/platforms/linux/platform.html#getConfig%2Cstring%2Cstring">platform: proc getConfig(appName: string; fileName: string): string</a></li>
+          </ul></dd>
+<dt><a name="getConfigHome" href="#getConfigHome"><span>getConfigHome:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="platform: proc getConfigHome(appName: string): string" href="windy/platforms/linux/platform.html#getConfigHome%2Cstring">platform: proc getConfigHome(appName: string): string</a></li>
           </ul></dd>
 <dt><a name="glXChooseVisual" href="#glXChooseVisual"><span>glXChooseVisual:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
@@ -1706,9 +1753,17 @@
 <li><a class="reference external"
           data-doc-search-tag="common: Button.MouseButton5" href="windy/common.html#MouseButton5">common: Button.MouseButton5</a></li>
           </ul></dd>
+<dt><a name="mouseCaptured" href="#mouseCaptured"><span>mouseCaptured:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="platform: proc mouseCaptured(window: Window): bool" href="windy/platforms/linux/platform.html#mouseCaptured%2CWindow">platform: proc mouseCaptured(window: Window): bool</a></li>
+          </ul></dd>
 <dt><a name="mouseDelta" href="#mouseDelta"><span>mouseDelta:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="platform: proc mouseDelta(window: Window): IVec2" href="windy/platforms/linux/platform.html#mouseDelta%2CWindow">platform: proc mouseDelta(window: Window): IVec2</a></li>
+          </ul></dd>
+<dt><a name="mouseInside" href="#mouseInside"><span>mouseInside:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="platform: proc mouseInside(window: Window): bool" href="windy/platforms/linux/platform.html#mouseInside%2CWindow">platform: proc mouseInside(window: Window): bool</a></li>
           </ul></dd>
 <dt><a name="MouseLeft" href="#MouseLeft"><span>MouseLeft:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
@@ -1952,6 +2007,12 @@
 <li><a class="reference external"
           data-doc-search-tag="http: proc onUploadProgress=(handle: HttpRequestHandle; callback: HttpProgressCallback)" href="windy/http.html#onUploadProgress%3D%2CHttpRequestHandle%2CHttpProgressCallback">http: proc onUploadProgress=(handle: HttpRequestHandle; callback: HttpProgressCallback)</a></li>
           </ul></dd>
+<dt><a name="openFileDialog" href="#openFileDialog"><span>openFileDialog:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="platform: proc openFileDialog(title = &quot;Open File&quot;; filters: seq[FileDialogFilter] = @[];
+               defaultPath = &quot;&quot;): string" href="windy/platforms/linux/platform.html#openFileDialog%2Cstring%2Cseq%5BFileDialogFilter%5D%2Cstring">platform: proc openFileDialog(title = &quot;Open File&quot;; filters: seq[FileDialogFilter] = @[];
+               defaultPath = &quot;&quot;): string</a></li>
+          </ul></dd>
 <dt><a name="OpenGL3Dot0" href="#OpenGL3Dot0"><span>OpenGL3Dot0:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="common: OpenGLVersion.OpenGL3Dot0" href="windy/common.html#OpenGL3Dot0">common: OpenGLVersion.OpenGL3Dot0</a></li>
@@ -2014,7 +2075,7 @@
           </ul></dd>
 <dt><a name="openWebSocket" href="#openWebSocket"><span>openWebSocket:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="http: proc openWebSocket(url: string; deadline = defaultHttpDeadline): WebSocketHandle" href="windy/http.html#openWebSocket%2Cstring">http: proc openWebSocket(url: string; deadline = defaultHttpDeadline): WebSocketHandle</a></li>
+          data-doc-search-tag="http: proc openWebSocket(url: string; deadline = defaultHttpDeadline; noDelay = false): WebSocketHandle" href="windy/http.html#openWebSocket%2Cstring">http: proc openWebSocket(url: string; deadline = defaultHttpDeadline; noDelay = false): WebSocketHandle</a></li>
           </ul></dd>
 <dt><a name="OperationNotAllowedCursor" href="#OperationNotAllowedCursor"><span>OperationNotAllowedCursor:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
@@ -2124,6 +2185,10 @@
 <li><a class="reference external"
           data-doc-search-tag="x: const RaiseLowest" href="windy/platforms/linux/x11/x.html#RaiseLowest">x: const RaiseLowest</a></li>
           </ul></dd>
+<dt><a name="releaseMouse" href="#releaseMouse"><span>releaseMouse:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="platform: proc releaseMouse(window: Window)" href="windy/platforms/linux/platform.html#releaseMouse%2CWindow">platform: proc releaseMouse(window: Window)</a></li>
+          </ul></dd>
 <dt><a name="ReplayKeyboard" href="#ReplayKeyboard"><span>ReplayKeyboard:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="x: const ReplayKeyboard" href="windy/platforms/linux/x11/x.html#ReplayKeyboard">x: const ReplayKeyboard</a></li>
@@ -2192,6 +2257,12 @@
 <li><a class="reference external"
           data-doc-search-tag="platform: proc runeInputEnabled=(window: Window; v: bool)" href="windy/platforms/linux/platform.html#runeInputEnabled%3D%2CWindow%2Cbool">platform: proc runeInputEnabled=(window: Window; v: bool)</a></li>
           </ul></dd>
+<dt><a name="saveFileDialog" href="#saveFileDialog"><span>saveFileDialog:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="platform: proc saveFileDialog(title = &quot;Save File&quot;; filters: seq[FileDialogFilter] = @[];
+               defaultPath = &quot;&quot;; defaultName = &quot;&quot;): string" href="windy/platforms/linux/platform.html#saveFileDialog%2Cstring%2Cseq%5BFileDialogFilter%5D%2Cstring%2Cstring">platform: proc saveFileDialog(title = &quot;Save File&quot;; filters: seq[FileDialogFilter] = @[];
+               defaultPath = &quot;&quot;; defaultName = &quot;&quot;): string</a></li>
+          </ul></dd>
 <dt><a name="Screen" href="#Screen"><span>Screen:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="common: object Screen" href="windy/common.html#Screen">common: object Screen</a></li>
@@ -2214,9 +2285,17 @@
 <li><a class="reference external"
           data-doc-search-tag="platform: proc scrollDelta(window: Window): Vec2" href="windy/platforms/linux/platform.html#scrollDelta%2CWindow">platform: proc scrollDelta(window: Window): Vec2</a></li>
           </ul></dd>
+<dt><a name="send" href="#send"><span>send:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="http: proc send(handle: WebSocketHandle; msg: string; kind = Utf8Message)" href="windy/http.html#send%2CWebSocketHandle%2Cstring">http: proc send(handle: WebSocketHandle; msg: string; kind = Utf8Message)</a></li>
+          </ul></dd>
 <dt><a name="setClipboardString" href="#setClipboardString"><span>setClipboardString:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="platform: proc setClipboardString(s: string)" href="windy/platforms/linux/platform.html#setClipboardString%2Cstring">platform: proc setClipboardString(s: string)</a></li>
+          </ul></dd>
+<dt><a name="setConfig" href="#setConfig"><span>setConfig:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="platform: proc setConfig(appName: string; fileName: string; content: string)" href="windy/platforms/linux/platform.html#setConfig%2Cstring%2Cstring%2Cstring">platform: proc setConfig(appName: string; fileName: string; content: string)</a></li>
           </ul></dd>
 <dt><a name="SetModeDelete" href="#SetModeDelete"><span>SetModeDelete:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
@@ -10196,7 +10275,7 @@
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br>
-        <small style="color: var(--hint);">Made with Nim. Generated: 2026-01-09 23:30:53 UTC</small>
+        <small style="color: var(--hint);">Made with Nim. Generated: 2026-10-22 02:37:02 UTC</small>
       </div>
     </div>
   </div>
