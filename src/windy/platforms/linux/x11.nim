@@ -1063,9 +1063,10 @@ proc pollEvents(window: Window) =
     of xeButtonPress, xeButtonRelease:
 
       template pushScrollEvent(delta: Vec2) =
-        window.perFrame.scrollDelta = delta
-        if window.onScroll != nil:
-          window.onScroll()
+        if ev.kind == xeButtonPress:
+          window.perFrame.scrollDelta += delta
+          if window.onScroll != nil:
+            window.onScroll()
 
       let
         now = getTime()
