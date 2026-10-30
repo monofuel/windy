@@ -58,11 +58,13 @@ conversion is scalar in this diagnostic; the player's XRGB converter uses SIMD.
 Unchanged-panel caching is intentionally absent because the pattern moves.
 
 Reports include generation, upload, rendering/finish, submission and completion
-waits, mean/p95/max, process CPU time per frame, frames over 20 ms and paired
+waits, mean/p95/max, main-thread CPU time per frame, frames over 20 ms and paired
 completion skew. GPU rendering also separates draw calls, EGL swap, GL finish
 and GBM acquisition. CPU submission includes full-panel uploads. GPU rendering
 includes EGL swap/GBM acquisition. Never compare the two labels as isolated
-equivalent operations; compare total process CPU and the complete pipeline.
+equivalent operations; compare main-thread CPU and the complete pipeline.
+Nim's `cpuTime` uses the calling thread on Linux; these counters exclude Mesa
+background threads and are not whole-process CPU measurements.
 
 Normal exit restores the captured plane/connector/CRTC state before releasing
 buffers. Cleanup errors are reported while remaining resources are still
@@ -91,13 +93,13 @@ screen order, smooth markers and no visible moving tears.
 
 Matched eight-second runs with the same shipped ARM64 diagnostic:
 
-| Source per panel / input | CPU reference CPU ms/frame | GPU CPU ms/frame | CPU / GPU frames | CPU / GPU frames over 20 ms |
+| Source per panel / input | CPU reference main-thread ms/frame | GPU main-thread ms/frame | CPU / GPU frames | CPU / GPU frames over 20 ms |
 | --- | ---: | ---: | ---: | ---: |
 | 256×192 / XBGR, 4× full panel | 7.605 | 1.935 | 481 / 480 | 1 / 2 |
 | 256×224 / XBGR, 3× with borders | 7.603 | 2.118 | 481 / 481 | 2 / 2 |
 
-All runs are approximately 60 FPS. CPU time includes synthetic frame generation;
-GPU presentation reduces that total by roughly 72–75%. These are presentation
+All runs are approximately 60 FPS. Main-thread time includes synthetic frame generation;
+GPU presentation reduces that time by roughly 72–75%. These are presentation
 tests, not emulator benchmarks or measurements of player integration. Initial
 activation is included; no warmup frames are discarded.
 

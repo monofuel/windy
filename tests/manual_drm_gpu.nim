@@ -649,7 +649,7 @@ proc main() =
     if elapsed(frameStarted) > 20: inc late
   echo "Mode: ", paramStr(6), "; layout: ", paramStr(4), "; format: ", paramStr(5),
     "; frames: ", frames, "; elapsed ms: ", elapsed(started), "; frames over 20 ms: ", late
-  echo "Process CPU ms/frame: ", (cpuTime() - cpuStarted) * 1000 / frames.float64
+  echo "Main-thread CPU ms/frame: ", (cpuTime() - cpuStarted) * 1000 / frames.float64
   report("Generate", timings.generate)
   report("Upload", timings.upload)
   report("Render/finish", timings.render)
