@@ -396,7 +396,6 @@ proc draw(probe: Probe) =
     glVertexAttribPointer(0, 2, GlFloat, 0, 16, addr vertices[0])
     glVertexAttribPointer(1, 2, GlFloat, 0, 16, addr vertices[2])
     glDrawArrays(GlTriangles, 0, 6)
-  glFinish()
   checked(glGetError() == 0, "Drawing GPU pattern")
 
 proc readback(probe: Probe) =
@@ -576,6 +575,9 @@ proc main() =
       step = getMonoTime()
       probe.draw()
       checkedEgl(eglSwapBuffers(probe.egl, probe.eglSurface), "Swapping EGL render buffer")
+      # Include any resolve queued by EGL's swap before exposing the BO to KMS.
+      glFinish()
+      checked(glGetError() == 0, "Finishing GPU presentation")
       let bo = gbm_surface_lock_front_buffer(probe.surface)
       checked(bo != nil, "Locking completed GBM buffer")
       probe.locked.add bo
