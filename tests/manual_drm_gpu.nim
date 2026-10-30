@@ -563,6 +563,10 @@ proc main() =
   probe.configure()
   generate(probe.pixels, probe.sourceHeight, 0, probe.layout)
   if paramStr(6) != "cpu":
+    # Retain discovery metadata without reserving unused CPU scanout storage.
+    for screen in probe.display.screens:
+      probe.display.closeScreen(screen)
+      screen.buffers.setLen(0)
     probe.openGpu()
     glTexSubImage2D(GlTexture, 0, 0, 0, SourceWidth, cint(probe.sourceHeight * 2), GlRgba, GlByte, addr probe.pixels[0])
     probe.draw()
