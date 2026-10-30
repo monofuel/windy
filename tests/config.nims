@@ -4,11 +4,14 @@ when defined(emscripten):
   include "../examples/config.nims"
 
 import std/os
-if projectName() == "manual_drm_gpu" and not defined(debug):
+if projectName() in ["manual_drm_gpu", "manual_drm_pixelpair"] and not defined(debug):
   # Measure the same shipped settings as the graphical applications.
   switch("define", "release")
   switch("define", "danger")
 let testBackends = getEnv("WINDY_TEST_BACKENDS")
+if projectName() == "test_drm_pixelpair" and testBackends.len == 0:
+  switch("define", "useCpu")
+  switch("define", "windyBackends=drm")
 if testBackends.len > 0:
   switch("define", "useCpu")
   switch("define", "windyBackends=" & testBackends)

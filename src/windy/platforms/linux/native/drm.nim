@@ -1,7 +1,7 @@
 import
   std/[dynlib, monotimes, os, posix, strformat, strutils, times],
   pixie,
-  ./[framebuffer, pixels]
+  ./[framebuffer, pixels, pixelpair]
 
 type
   ModeInfo = object
@@ -128,6 +128,7 @@ type
     api: DrmApi
     fd: cint
     master: bool
+    gpuOwned*: bool
     screens*: seq[DrmScreen]
     retiredScreens: seq[DrmScreen]
 
@@ -256,6 +257,8 @@ proc waitForFlip(display: DrmDisplay, screen: DrmScreen) =
       raiseOSError(osLastError(), "Reading DRM page flip events")
 
 proc closeScreen*(display: DrmDisplay, screen: DrmScreen) =
+  if display.gpuOwned:
+    raise newException(IOError, "Close the GPU pixel presenter before its windows")
   var errors: seq[string]
   try:
     display.waitForFlip(screen)
@@ -310,6 +313,8 @@ proc closeScreen*(display: DrmDisplay, screen: DrmScreen) =
     raise newException(IOError, errors.join("; "))
 
 proc close*(display: DrmDisplay) =
+  if display.gpuOwned:
+    raise newException(IOError, "Close the GPU pixel presenter before its display")
   var errors: seq[string]
   for screen in display.screens:
     try:
@@ -505,6 +510,8 @@ proc upload*(display: DrmDisplay, index: int, image: Image) =
       addr screen.pixels[row * int(scanout.buffer.width)], int(scanout.buffer.width) * 4)
 
 proc present*(display: DrmDisplay, index: int, image: Image) =
+  if display.gpuOwned or display.screens[index].buffers.len == 0:
+    raise newException(IOError, "Reopen windows before switching from GPU to CPU pixels")
   display.upload(index, image)
   let screen = display.screens[index]
   if not screen.activated:
@@ -533,3 +540,5 @@ proc openDrm*(path: string): DrmDisplay =
     let error = osLastError()
     result.close()
     raiseOSError(error, path)
+
+include drmgpu

@@ -23,6 +23,8 @@ proc close*(window: Window) =
   if window.direct == nil or window.direct.closed:
     return
   let data = window.direct
+  if data.drm != nil and data.drm.gpuOwned:
+    raise newException(WindyError, "Close the GPU pixel presenter before its windows")
   data.closed = true
   try:
     if data.touch != nil:
