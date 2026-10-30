@@ -37,7 +37,7 @@ type
     armed, pending: bool
     callbackError: string
     gbm, surface, egl, context, eglSurface: pointer
-    program, texture: uint32
+    program, texture, vertices: uint32
     gbmFrames: seq[tuple[bo: pointer, fb: uint32]]
     locked: seq[pointer]
     front: pointer
@@ -81,6 +81,10 @@ const
   AtomicCapability = 3'u64
   PrimaryPlane = 1'u64
   GbmScanoutRendering = 5'u32
+  GlArrayBuffer = 0x8892'u32
+  GlStaticDraw = 0x88e4'u32
+  VerticesPerPanel = 6
+  VertexStride = 4 * sizeof(cfloat)
   EglNone = 0x3038.cint
   EglConfigAttributes = [0x3033.cint, 4, 0x3040, 4, 0x3024, 8,
     0x3023, 8, 0x3022, 8, 0x3025, 0, 0x3026, 0, EglNone]
@@ -144,6 +148,10 @@ proc glUniform1f(location: cint, value: cfloat)
 proc glUniform1i(location, value: cint)
 proc glGenTextures(count: cint, textures: ptr cuint)
 proc glDeleteTextures(count: cint, textures: ptr cuint)
+proc glGenBuffers(count: cint, buffers: ptr cuint)
+proc glBindBuffer(target, buffer: cuint)
+proc glBufferData(target: cuint, size: int, data: pointer, usage: cuint)
+proc glDeleteBuffers(count: cint, buffers: ptr cuint)
 proc glBindTexture(target, texture: cuint)
 proc glTexParameteri(target, name: cuint, value: cint)
 proc glTexImage2D(target: cuint, level, internal, width, height, border: cint,
@@ -380,6 +388,16 @@ proc openGpu(probe: Probe) =
   glTexImage2D(GlTexture, 0, cint(GlRgba), SourceWidth, cint(probe.sourceHeight * 2), 0, GlRgba, GlByte, nil)
   glEnableVertexAttribArray(0)
   glEnableVertexAttribArray(1)
+  var vertices: seq[cfloat]
+  for index in 0..1:
+    let
+      first = cfloat(index) * 0.5
+      last = first + 0.5
+    vertices.add @[-1.cfloat, -1, 0, last, 1, -1, 1, last, -1, 1, 0, first,
+      -1, 1, 0, first, 1, -1, 1, last, 1, 1, 1, first]
+  glGenBuffers(1, addr probe.vertices)
+  glBindBuffer(GlArrayBuffer, probe.vertices)
+  glBufferData(GlArrayBuffer, vertices.len * sizeof(cfloat), addr vertices[0], GlStaticDraw)
 
 proc draw(probe: Probe) =
   ## Enlarge two cropped texture regions with nearest-neighbour sampling.
@@ -387,15 +405,11 @@ proc draw(probe: Probe) =
   glClear(GlColourBuffer)
   let view = fit(SourceWidth, probe.sourceHeight, probe.panelWidth, probe.panelHeight)
   for index in 0..1:
-    let
-      first = cfloat(index) * 0.5
-      last = first + 0.5
-    var vertices = [-1.cfloat, -1, 0, last, 1, -1, 1, last, -1, 1, 0, first,
-      -1, 1, 0, first, 1, -1, 1, last, 1, 1, 1, first]
+    let offset = index * VerticesPerPanel * VertexStride
     glViewport(cint(view.x), cint((1 - index) * probe.panelHeight + view.y), cint(view.width), cint(view.height))
-    glVertexAttribPointer(0, 2, GlFloat, 0, 16, addr vertices[0])
-    glVertexAttribPointer(1, 2, GlFloat, 0, 16, addr vertices[2])
-    glDrawArrays(GlTriangles, 0, 6)
+    glVertexAttribPointer(0, 2, GlFloat, 0, VertexStride, cast[pointer](offset))
+    glVertexAttribPointer(1, 2, GlFloat, 0, VertexStride, cast[pointer](offset + 2 * sizeof(cfloat)))
+    glDrawArrays(GlTriangles, 0, VerticesPerPanel)
   checked(glGetError() == 0, "Drawing GPU pattern")
 
 proc readback(probe: Probe) =
@@ -489,6 +503,7 @@ proc close(probe: Probe) =
   if probe.egl != nil:
     if probe.context != nil:
       if probe.texture != 0: glDeleteTextures(1, addr probe.texture)
+      if probe.vertices != 0: glDeleteBuffers(1, addr probe.vertices)
       if probe.program != 0: glDeleteProgram(probe.program)
     attempt: checkedEgl(eglMakeCurrent(probe.egl, nil, nil, nil), "Releasing EGL context")
     if probe.eglSurface != nil:
