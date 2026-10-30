@@ -85,8 +85,9 @@ generation needed temporary swap, removed before these measurements.
 Every GPU pixel and black border passes exact readback for both XRGB and XBGR
 in both layouts. One shared 1024×1536 linear framebuffer passes atomic TEST_ONLY
 and real paired flips. Both CRTC events arrive and cleanup restores the launcher.
-The synthetic animation and all tests are silent. Manual confirmation of physical
-orientation, perceived crispness and tearing is deferred.
+The synthetic animation and all tests are silent. Monofuel manually confirms
+both full-panel 4× and bordered 3× patterns look correct: upright, crisp, correct
+screen order, smooth markers and no visible moving tears.
 
 Matched eight-second runs with the same shipped ARM64 diagnostic:
 
