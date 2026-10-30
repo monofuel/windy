@@ -47,6 +47,7 @@ type
     skew: seq[float64]
   Samples = object
     generate, upload, render, submit, wait: seq[float64]
+    draw, swap, finish, acquire: seq[float64]
 
 const
   PlaneObject = 0xeeeeeeee'u32
@@ -78,6 +79,10 @@ const
   EglEsApi = 0x30a0'u32
   EglNativeVisual = 0x302e.cint
   EglClientVersion = 0x3098.cint
+  EglDepthSize = 0x3025.cint
+  EglStencilSize = 0x3026.cint
+  EglSamples = 0x3031.cint
+  EglSampleBuffers = 0x3032.cint
   AtomicCapability = 3'u64
   PrimaryPlane = 1'u64
   GbmScanoutRendering = 5'u32
@@ -339,13 +344,22 @@ proc openGpu(probe: Probe) =
     selected: pointer
   checkedEgl(eglChooseConfig(probe.egl, addr attributes[0], nil, 0, addr count), "Counting EGL configs")
   checked(count > 0, "Expected a window-compatible EGL config")
-  var configs = newSeq[pointer](count)
+  var
+    configs = newSeq[pointer](count)
+    sizes: array[4, cint]
   checkedEgl(eglChooseConfig(probe.egl, addr attributes[0], addr configs[0], count, addr count), "Choosing EGL config")
   for index in 0 ..< int(count):
     var visual: cint
     checkedEgl(eglGetConfigAttrib(probe.egl, configs[index], EglNativeVisual, addr visual), "Reading EGL visual")
-    if uint32(visual) == Xrgb8888: selected = configs[index]
-  checked(selected != nil, "Finding XRGB EGL config")
+    if uint32(visual) != Xrgb8888: continue
+    for field, name in [EglDepthSize, EglStencilSize, EglSamples, EglSampleBuffers]:
+      checkedEgl(eglGetConfigAttrib(probe.egl, configs[index], name, addr sizes[field]), "Reading EGL buffers")
+    # EGL's zero attributes specify minimum sizes, not the absence of MSAA/depth.
+    if sizes == [0.cint, 0, 0, 0]:
+      selected = configs[index]
+      break
+  checked(selected != nil, "Finding XRGB EGL config without depth, stencil or MSAA")
+  echo "EGL depth/stencil/samples/sample buffers: ", sizes
   var contextAttributes = [EglClientVersion, 2.cint, EglNone]
   probe.context = eglCreateContext(probe.egl, selected, nil, addr contextAttributes[0])
   checked(probe.context != nil, "Creating GLES2 context")
@@ -593,13 +607,20 @@ proc main() =
       timings.upload.add elapsed(step)
       step = getMonoTime()
       probe.draw()
+      timings.draw.add elapsed(step)
+      var gpuStep = getMonoTime()
       checkedEgl(eglSwapBuffers(probe.egl, probe.eglSurface), "Swapping EGL render buffer")
+      timings.swap.add elapsed(gpuStep)
       # Include any resolve queued by EGL's swap before exposing the BO to KMS.
+      gpuStep = getMonoTime()
       glFinish()
       checked(glGetError() == 0, "Finishing GPU presentation")
+      timings.finish.add elapsed(gpuStep)
+      gpuStep = getMonoTime()
       let bo = gbm_surface_lock_front_buffer(probe.surface)
       checked(bo != nil, "Locking completed GBM buffer")
       probe.locked.add bo
+      timings.acquire.add elapsed(gpuStep)
       timings.render.add elapsed(step)
       step = getMonoTime()
       probe.submit(probe.framebuffer(bo))
@@ -632,6 +653,10 @@ proc main() =
   report("Generate", timings.generate)
   report("Upload", timings.upload)
   report("Render/finish", timings.render)
+  report("Draw calls", timings.draw)
+  report("EGL swap", timings.swap)
+  report("GL finish", timings.finish)
+  report("GBM acquire", timings.acquire)
   report("Submit", timings.submit)
   report("Wait", timings.wait)
   report("Panel completion skew", probe.skew)

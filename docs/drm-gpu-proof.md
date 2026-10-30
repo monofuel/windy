@@ -28,6 +28,8 @@ Do not run beside games, compiler jobs or other performance tests.
   opaque R,G,B,255 bytes; XRGB uploads B,G,R,255. A shader handles the latter's
   channel interpretation without changing the source buffer on the CPU.
 - One linear XRGB GBM surface contains two full-resolution output regions.
+  EGL selection requires zero depth, stencil, samples and sample buffers;
+  `eglChooseConfig` minimum sizes alone do not exclude multisampling.
   Nearest-neighbour quads enlarge each source region by an integer and clear the
   remaining border to black. The `ds` layout uses 256×192 per panel; `earthbound`
   uses 256×224. Panel dimensions come from DRM, not board identifiers.
@@ -57,7 +59,8 @@ Unchanged-panel caching is intentionally absent because the pattern moves.
 
 Reports include generation, upload, rendering/finish, submission and completion
 waits, mean/p95/max, process CPU time per frame, frames over 20 ms and paired
-completion skew. CPU submission includes full-panel uploads. GPU rendering
+completion skew. GPU rendering also separates draw calls, EGL swap, GL finish
+and GBM acquisition. CPU submission includes full-panel uploads. GPU rendering
 includes EGL swap/GBM acquisition. Never compare the two labels as isolated
 equivalent operations; compare total process CPU and the complete pipeline.
 
@@ -71,7 +74,44 @@ Run `nim r tests/test_drm_gpu_patterns.nim` for colours, both layouts, CPU outpu
 both completion orders and rejected duplicate/unexpected events. Existing
 `tests/test_linux_drm.nim` covers the unchanged CPU DRM lifecycle.
 
-## Device results
+## RG DS Plus results
 
-Pending physical validation. A successful build or advertised DRM format does
-not establish hardware rendering, paired scanout acceptance or a performance win.
+Tested with Linux `7.0.2-mono-rgdsplus-rocknix-r3`, Mesa 26.1.8 and hardware
+`Mali-G52 r1 MC1 (Panfrost)`, OpenGL ES 3.1. DSI-2 is top (CRTC70/plane39),
+DSI-1 bottom (CRTC69/plane33). No X11 or Wayland is involved. Gentoo compiled
+Mesa through the MLE `arm64-rgdsplus` distcc target; memory-heavy local source
+generation needed temporary swap, removed before these measurements.
+
+Every GPU pixel and black border passes exact readback for both XRGB and XBGR
+in both layouts. One shared 1024×1536 linear framebuffer passes atomic TEST_ONLY
+and real paired flips. Both CRTC events arrive and cleanup restores the launcher.
+The synthetic animation and all tests are silent. Manual confirmation of physical
+orientation, perceived crispness and tearing is deferred.
+
+Matched eight-second runs with the same shipped ARM64 diagnostic:
+
+| Source per panel / input | CPU reference CPU ms/frame | GPU CPU ms/frame | CPU / GPU frames | CPU / GPU frames over 20 ms |
+| --- | ---: | ---: | ---: | ---: |
+| 256×192 / XBGR, 4× full panel | 7.605 | 1.935 | 481 / 480 | 1 / 2 |
+| 256×224 / XBGR, 3× with borders | 7.603 | 2.118 | 481 / 481 | 2 / 2 |
+
+All runs are approximately 60 FPS. CPU time includes synthetic frame generation;
+GPU presentation reduces that total by roughly 72–75%. These are presentation
+tests, not emulator benchmarks or measurements of player integration. Initial
+activation is included; no warmup frames are discarded.
+
+GPU upload averages 0.256–0.300 ms and render/swap/finish about 5.0–5.1 ms,
+mostly GPU completion wait. XRGB also passes real paired scanout in both layouts
+at approximately 60 FPS, with 2.063 / 2.251 CPU ms/frame respectively. Completion
+timestamp skew settles around 6.1 ms: the panels show one coordinated generation,
+but their physical refresh phases remain offset.
+
+The first configuration selected the last matching EGL visual, which had 24-bit
+depth, 8-bit stencil and 16× MSAA. GPU completion then took about 78 ms and output
+ran near 11 FPS despite 800 MHz GPU clocks. Explicitly selecting zero-sized
+auxiliary buffers removes that work. The diagnostic reports the selected sizes
+and fails if that configuration is unavailable.
+
+The production Windy backends and player remain unchanged. Next integration must
+preserve frame ownership, both completion events, exact pixel scaling and X11/
+fbdev behavior; conservative `glFinish` can be revisited separately.
