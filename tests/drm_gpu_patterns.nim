@@ -80,8 +80,14 @@ proc scalePanel*[T](source: seq[uint32], panel, sourceHeight: int, layout: Pixel
       for x in view.x + view.width ..< width: output[y * width + x] = cast[T](0xff000000'u32)
   for sourceY in 0 ..< sourceHeight:
     let target = (view.y + sourceY * scale) * width + view.x
-    for sourceX in 0 ..< SourceWidth:
-      let colour = pack(source[(panel * sourceHeight + sourceY) * SourceWidth + sourceX], layout)
-      for repeat in 0 ..< scale: output[target + sourceX * scale + repeat] = cast[T](colour)
+    template expandRow(factor: int) =
+      for sourceX in 0 ..< SourceWidth:
+        let colour = pack(source[(panel * sourceHeight + sourceY) * SourceWidth + sourceX], layout)
+        for repeat in 0 ..< factor: output[target + sourceX * factor + repeat] = cast[T](colour)
+    case scale
+    of 2: expandRow(2)
+    of 3: expandRow(3)
+    of 4: expandRow(4)
+    else: expandRow(scale)
     for repeat in 1 ..< scale:
       copyMem(addr output[target + repeat * width], addr output[target], view.width * sizeof(uint32))
