@@ -4,6 +4,10 @@ when defined(emscripten):
   include "../examples/config.nims"
 
 import std/os
+if projectName() == "manual_drm_gpu" and not defined(debug):
+  # Measure the same shipped settings as the graphical applications.
+  switch("define", "release")
+  switch("define", "danger")
 let testBackends = getEnv("WINDY_TEST_BACKENDS")
 if testBackends.len > 0:
   switch("define", "useCpu")
