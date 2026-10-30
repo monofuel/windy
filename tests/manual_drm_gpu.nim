@@ -327,10 +327,12 @@ proc openGpu(probe: Probe) =
   checkedEgl(eglBindAPI(EglEsApi), "Selecting OpenGL ES")
   var
     attributes = EglConfigAttributes
-    configs: array[64, pointer]
     count: cint
     selected: pointer
-  checkedEgl(eglChooseConfig(probe.egl, addr attributes[0], addr configs[0], 64, addr count), "Choosing EGL config")
+  checkedEgl(eglChooseConfig(probe.egl, addr attributes[0], nil, 0, addr count), "Counting EGL configs")
+  checked(count > 0, "Expected a window-compatible EGL config")
+  var configs = newSeq[pointer](count)
+  checkedEgl(eglChooseConfig(probe.egl, addr attributes[0], addr configs[0], count, addr count), "Choosing EGL config")
   for index in 0 ..< int(count):
     var visual: cint
     checkedEgl(eglGetConfigAttrib(probe.egl, configs[index], EglNativeVisual, addr visual), "Reading EGL visual")

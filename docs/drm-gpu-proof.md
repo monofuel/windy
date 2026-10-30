@@ -15,7 +15,7 @@ Nim dependency is needed.
 manual_drm_gpu CARD TOP_CONNECTOR BOTTOM_CONNECTOR ds|earthbound xbgr|xrgb gpu|cpu|inspect [seconds]
 ```
 
-`inspect` initializes EGL, renders and checks pixels, but never acquires DRM
+`inspect` initializes EGL, renders and checks pixels, but never requests DRM
 master or changes scanout. Other modes temporarily own both displays. Stop the
 display service before running them; use an outer timeout and restore the service
 on exit. Duration defaults to eight seconds and accepts only 1..8. Initialization
