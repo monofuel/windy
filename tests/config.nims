@@ -9,6 +9,9 @@ if projectName() in ["manual_drm_gpu", "manual_drm_pixelpair"] and not defined(d
   switch("define", "release")
   switch("define", "danger")
 let testBackends = getEnv("WINDY_TEST_BACKENDS")
+if projectName() == "test_x11_pixels":
+  switch("define", "useCpu")
+  switch("define", "windyBackends=" & (if testBackends.len > 0: testBackends else: "x11"))
 if projectName() == "test_drm_pixelpair" and testBackends.len == 0:
   switch("define", "useCpu")
   switch("define", "windyBackends=drm")

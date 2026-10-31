@@ -13,6 +13,8 @@ type
   LinuxWindowOptions* = object
     device*, output*, touchDevice*: string
     rotation*, touchRotation*: int
+    gpuPixels*: bool
+      ## Opt into a double-buffered X11 OpenGL drawable in CPU pixel builds.
 
 static:
   for backend in windyBackends.split(','):

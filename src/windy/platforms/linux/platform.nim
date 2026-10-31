@@ -238,6 +238,16 @@ else:
         return
     direct.unsupported()
 
+  proc hasGpuPixelContext*(window: Window): bool =
+    ## Report an open opt-in X11 GPU drawable without selecting a native backend.
+    when HasX11:
+      if window != nil and window.direct == nil: return x11.hasGpuPixelContext(window)
+
+  proc gpuPixelVsync*(window: Window): bool =
+    ## Report whether X11 swap control enabled vsync for this pixel window.
+    when HasX11:
+      if window != nil and window.direct == nil: return x11.gpuPixelVsync(window)
+
   proc swapBuffers*(window: Window) =
     when HasX11:
       if window.direct == nil:
