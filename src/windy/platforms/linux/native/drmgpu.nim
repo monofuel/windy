@@ -28,6 +28,7 @@ type
       modifiers: ptr uint64, count, flags: uint32): pointer {.cdecl.}
     gbm_surface_destroy: proc(surface: pointer) {.cdecl.}
     gbm_surface_lock_front_buffer: proc(surface: pointer): pointer {.cdecl.}
+    gbm_surface_has_free_buffers: proc(surface: pointer): cint {.cdecl.}
     gbm_surface_release_buffer: proc(surface, bo: pointer) {.cdecl.}
     gbm_bo_get_handle: proc(bo: pointer): GpuGbmHandle {.cdecl.}
     gbm_bo_get_stride: proc(bo: pointer): uint32 {.cdecl.}
@@ -105,7 +106,7 @@ type
     program, texture, vertices: uint32
     gbmFrames: seq[tuple[bo: pointer, fb: uint32]]
     locked: seq[pointer]
-    front: pointer
+    front, queued: pointer
     outputs: array[2, DrmScreen]
     regions: array[2, PixelRegion]
     panelWidth, panelHeight, textureWidth, textureHeight: int
@@ -188,6 +189,7 @@ proc gpuLoadApi(): GpuApi =
     bindSymbol(gbm_surface_create_with_modifiers2, gbmLibrary, "gbm_surface_create_with_modifiers2")
     bindSymbol(gbm_surface_destroy, gbmLibrary, "gbm_surface_destroy")
     bindSymbol(gbm_surface_lock_front_buffer, gbmLibrary, "gbm_surface_lock_front_buffer")
+    bindSymbol(gbm_surface_has_free_buffers, gbmLibrary, "gbm_surface_has_free_buffers")
     bindSymbol(gbm_surface_release_buffer, gbmLibrary, "gbm_surface_release_buffer")
     bindSymbol(gbm_bo_get_handle, gbmLibrary, "gbm_bo_get_handle")
     bindSymbol(gbm_bo_get_stride, gbmLibrary, "gbm_bo_get_stride")
@@ -646,10 +648,27 @@ proc newGpuDisplay*(display: DrmDisplay, outputs: array[2, DrmScreen]): GpuDispl
     result.close()
     raise
 
+proc gpuRetireFrame(probe: GpuDisplay) =
+  ## Release the previous scanout only after both controllers adopt its replacement.
+  if probe.queued == nil: return
+  gpuChecked(not probe.pending, "Cannot retire an incomplete paired flip")
+  if probe.front != nil:
+    probe.gpu.gbm_surface_release_buffer(probe.surface, probe.front)
+    probe.locked.delete(probe.locked.find(probe.front))
+  probe.front = probe.queued
+  probe.queued = nil
+
 proc presentGpuPixels*(probe: GpuDisplay, image: Image, regions: array[2, PixelRegion]) =
   ## Upload once, scale on the GPU, and retire storage after both vblank events.
   if probe == nil or probe.display == nil:
     raise newException(ValueError, "GPU pixel presenter is closed")
+  # Render while the previous pair flips, provided GBM has spare storage.
+  let renderAhead = probe.gpu.gbm_surface_has_free_buffers(probe.surface) != 0
+  if not renderAhead:
+    probe.gpuWaitPair()
+    probe.gpuRetireFrame()
+    gpuChecked(probe.gpu.gbm_surface_has_free_buffers(probe.surface) != 0,
+      "No free GPU render buffer after retiring the paired flip")
   probe.gpuCheckedEgl(probe.gpu.eglMakeCurrent(probe.egl, probe.eglSurface,
     probe.eglSurface, probe.context), "Activating GPU pixel context")
   probe.gpuUpload(image, regions)
@@ -660,10 +679,10 @@ proc presentGpuPixels*(probe: GpuDisplay, image: Image, regions: array[2, PixelR
   let bo = probe.gpu.gbm_surface_lock_front_buffer(probe.surface)
   gpuChecked(bo != nil, "Locking completed GBM buffer")
   probe.locked.add bo
-  probe.gpuSubmit(probe.gpuFramebuffer(bo))
-  probe.gpuWaitPair()
-  if probe.front != nil:
-    probe.gpu.gbm_surface_release_buffer(probe.surface, probe.front)
-    probe.locked.delete(probe.locked.find(probe.front))
-  probe.front = bo
+  let framebuffer = probe.gpuFramebuffer(bo)
+  if renderAhead:
+    probe.gpuWaitPair()
+    probe.gpuRetireFrame()
+  probe.gpuSubmit(framebuffer)
+  probe.queued = bo
 

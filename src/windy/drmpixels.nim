@@ -23,6 +23,7 @@ proc newDrmPixelPair*(first, second: Window): DrmPixelPair =
 
 proc presentPixels*(pair: DrmPixelPair, image: Image, regions: array[2, PixelRegion]) =
   ## Center integer-scaled source crops, using black for an empty crop or nil image.
+  ## Source pixels are consumed before returning; the paired flip may still be pending.
   if pair == nil: raise newException(WindyError, "GPU pixel pair is nil")
   pair.display.presentGpuPixels(image, regions)
 
