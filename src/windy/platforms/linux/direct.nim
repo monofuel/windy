@@ -10,7 +10,7 @@ when HasX11:
 else:
   type Window* = ref object
     onCloseRequest*, onFrame*, onMove*, onResize*, onFocusChange*: Callback
-    onMouseMove*, onScroll*, onImeChange*: Callback
+    onMouseMove*, onScroll*, onImeChange*, onRefresh*: Callback
     onButtonPress*, onButtonRelease*: ButtonCallback
     onRune*: RuneCallback
     onFileDrop*: FileDropCallback

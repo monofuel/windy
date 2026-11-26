@@ -23,6 +23,8 @@ type
     onMove*: Callback
     onResize*: Callback
     onFocusChange*: Callback
+    onRefresh*: Callback
+      ## Request a repaint after X11 exposure or remapping.
     onMouseMove*: Callback
     onScroll*: Callback
     onButtonPress*: ButtonCallback
@@ -969,6 +971,10 @@ proc pollEvents(window: Window) =
 
   while display.XCheckIfEvent(ev.addr, checkEvent, cast[pointer](window)) != 0:
     case ev.kind
+
+    of xeExpose, xeMap:
+      if window.onRefresh != nil:
+        window.onRefresh()
 
     of xeClientMessage:
       if ev.client.data.l[0] == xaWMDeleteWindow.clong:
